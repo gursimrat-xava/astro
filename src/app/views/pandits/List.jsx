@@ -100,9 +100,8 @@ const List = () => {
                 <TableCell className="px-0" align="center">Languages</TableCell>
                 <TableCell className="px-0" align="center">Hours Worked</TableCell>
                 <TableCell className="px-0" align="center">Active</TableCell>
-                <TableCell className="px-0" align="center">Balance Consumed</TableCell>
                 <TableCell className="px-0" align="center">Minutes Consumed</TableCell>
-                <TableCell className="px-0" align="center">Chats Replied</TableCell>
+                <TableCell className="px-0" align="center">Availability</TableCell>
                 <TableCell className="px-0" align="center">Actions</TableCell>
 
               </TableRow>
@@ -158,24 +157,36 @@ const List = () => {
                         name="active"
                       />
                     </TableCell>
-                    <TableCell
-                      className="px-0 capitalize"
-                      align="center"
-                    >
-                      {pandit.balanceConsumed}
-                    </TableCell>
+                    
                     <TableCell
                       className="px-0 capitalize"
                       align="center"
                     >
                       {pandit.minutesConsumed}
                     </TableCell>
-                    <TableCell
-                      className="px-0 capitalize"
-                      align="center"
-                    >
-                      {pandit.chatsReplied}
-                    </TableCell>
+                    
+                      {
+                          pandit.isOnline ?
+                            <TableCell
+                              className="px-0 capitalize"
+                              align="center"
+                            >
+                              <IconButton>
+                              <Icon color="secondary">chat</Icon>
+                              </IconButton>
+                              <IconButton>
+                              <Icon color="secondary">call</Icon>
+                              </IconButton>
+                            </TableCell>
+                            :
+                            <TableCell
+                              className="px-0 capitalize"
+                              align="center"
+                            >
+                              Offline
+                            </TableCell>
+                        }
+                    
                     <TableCell
                       className="px-0 capitalize"
                       align="center"

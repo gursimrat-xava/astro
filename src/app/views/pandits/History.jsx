@@ -91,8 +91,7 @@ const History = () => {
             <TableHead>
               <TableRow>
                 <TableCell className="px-0">User</TableCell>
-                <TableCell className="px-0">Minutes</TableCell>
-                <TableCell className="px-0">Seconds</TableCell>
+                <TableCell className="px-0">Duration</TableCell>
                 <TableCell className="px-0">Reciever</TableCell>
 
               </TableRow>
@@ -116,13 +115,7 @@ const History = () => {
                       className="px-0 capitalize"
                       align="left"
                     >
-                      {call.minutes}
-                    </TableCell>
-                    <TableCell
-                      className="px-0 capitalize"
-                      align="left"
-                    >
-                      {call.seconds}
+                      {call.minutes} Mins {call.seconds} Seconds
                     </TableCell>
                     <TableCell
                       className="px-0 capitalize"

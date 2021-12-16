@@ -41,24 +41,30 @@ const Banners = () => {
 
 
   const uploadFile = (e) => {
-    setBanner2('s');
+
   }
 
   async function handleSubmit(e) {
     e.preventDefault();
     try {
-      let homePage = [banner1, 
-        banner2, 
-        banner3, 
-        banner4, 
-        banner5];
+      let homePage = [banner1];
 
        // Update banners
 
-       /* firebase.firestore().collection("banners").doc('images').set({
+        firebase.firestore().collection("banners").doc('images').set({
           homePage,
           rechargePage
-        })*/
+        })
+        alert('Banner Updated');
+
+        /*
+        <TextValidator
+            label="Repeat password"
+            onChange={uploadFile}
+            name="banner1"
+            type="file"
+        />
+        */
     }
     catch (e) {
       console.log("error", e)
@@ -71,6 +77,7 @@ const Banners = () => {
     <ValidatorForm onSubmit={handleSubmit} onError={() => null}>
     <DialogContent>
         <h3>Homepage Banners Url</h3>
+        
         <TextValidator
                     autoFocus
                     margin="dense"
@@ -85,12 +92,6 @@ const Banners = () => {
                     value={banner1 || ''}
                 />
         <TextValidator
-            label="Repeat password"
-            onChange={uploadFile}
-            name="banner1"
-            type="file"
-        />
-        <TextValidator
                     autoFocus
                     margin="dense"
                     label=""
@@ -99,7 +100,6 @@ const Banners = () => {
                     onChange={(e) => setBanner2(e.target.value)}
                     variant="outlined"
                     fullWidth
-                    validators={['required']}
                     errorMessages={['this field is required']}
                     value={banner2 || ''}
                 />
@@ -112,7 +112,6 @@ const Banners = () => {
                     onChange={(e) => setBanner3(e.target.value)}
                     variant="outlined"
                     fullWidth
-                    validators={['required']}
                     errorMessages={['this field is required']}
                     value={banner3 || ''}
                 />
@@ -125,7 +124,6 @@ const Banners = () => {
                     onChange={(e) => setBanner4(e.target.value)}
                     variant="outlined"
                     fullWidth
-                    validators={['required']}
                     errorMessages={['this field is required']}
                     value={banner4 || ''}
                 />
@@ -138,7 +136,6 @@ const Banners = () => {
                     onChange={(e) => setBanner5(e.target.value)}
                     variant="outlined"
                     fullWidth
-                    validators={['required']}
                     errorMessages={['this field is required']}
                     value={banner5 || ''}
                 />
