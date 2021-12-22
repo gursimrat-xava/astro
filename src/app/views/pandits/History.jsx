@@ -1,20 +1,14 @@
 import React, { useState, useEffect } from 'react'
 import { Breadcrumb } from 'app/components'
 import firebase from 'config.js'
-import { useHistory } from 'react-router-dom';
 import { classList } from 'utils'
 import {
-  Avatar,
   Card,
-  Button,
-  IconButton,
-  Switch,
   Table,
   TableHead,
   TableBody,
   TableRow,
   TableCell,
-  Icon,
   TablePagination,
 } from '@material-ui/core'
 import Add from './Add'
@@ -53,15 +47,6 @@ const History = () => {
     setRowsPerPage(+event.target.value)
     setPage(0)
   }
-
-  const handleEdit = (pandit) => {
-    setOpenEdit(pandit);
-  }
-
-  const handleChange = (pandit, selected) => {
-    // change active status of panditselected
-    firebase.firestore().collection('pandits').doc(pandit.uid).set({ active: selected }, { merge: true });
-  };
 
   return (
     <div className="m-sm-30">
