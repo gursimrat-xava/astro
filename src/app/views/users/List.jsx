@@ -195,7 +195,7 @@ const List = () => {
       }
     },
     {
-      name: "active",
+      name: "edit",
       label: "Actions",
       options: {
         customBodyRenderLite: (dataIndex) => {
