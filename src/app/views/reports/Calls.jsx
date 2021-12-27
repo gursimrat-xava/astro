@@ -289,7 +289,7 @@ const List = () => {
       name: "balanceAfterCall",
       label: "Balance After Call",
       options: {
-
+        filter: false,
       }
     },
   ];

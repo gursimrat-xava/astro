@@ -1,27 +1,16 @@
 import React, { useState, useEffect } from 'react'
 import { Breadcrumb } from 'app/components'
 import firebase from 'config.js'
-import { useHistory } from 'react-router-dom';
-import { classList } from 'utils'
 import {
-  Avatar,
   Card,
-  Button,
-  IconButton,
-  Switch,
-  Table,
-  TableHead,
-  TableBody,
-  TableRow,
-  TableCell,
-  Icon,
-  TablePagination,
+  FormLabel,
+  FormGroup,
+  TextField,
 } from '@material-ui/core'
+import MUIDataTable from "mui-datatables";
 import Add from './Add'
 
 const History = () => {
-  const [rowsPerPage, setRowsPerPage] = useState(5)
-  const [page, setPage] = useState(0)
   const [openAdd, setOpenAdd] = useState(false)
   const [openEdit, setOpenEdit] = useState(null)
   const [callList, setCallList] = useState([])
@@ -33,7 +22,9 @@ const History = () => {
     .then(querySnapshot => {
       const data = [];
       querySnapshot.forEach(queryDocumentSnapshot => {
-        data.push(queryDocumentSnapshot.data())
+        const temp = queryDocumentSnapshot.data();
+        temp.duration = (temp.minutes*60) + temp.seconds;
+        data.push(temp);
       });
       setCallList(data);
     })
@@ -44,23 +35,121 @@ const History = () => {
   }, [])
 
 
+  const columns = [
+    {
+      name: "callername",
+      label: "User",
+      options: {
+        filter: true,
+        customFilterListOptions: {
+          render: v => `User: ${v}`
+        },
+        filterType: 'textField',
+        sort: true,
+      }
+    },
+    {
+      name: "duration",
+      label: "Duration",
+      options: {
+        customBodyRenderLite: (dataIndex, rowIndex) => {
+          const call = callList[dataIndex];
+          const duration = (call.minutes * 60) + call.seconds;
+          return `${duration < 60 ? '' : duration / 60 + 'm'} ${duration % 60}s`
+        },
+        filter: true,
+        filterType: 'custom',
+        customFilterListOptions: {
+          render: v => {
+            if (v[0] && v[1]) {
+              return `Min Duration: ${v[0]}, Max Duration: ${v[1]}`;
+            } else if (v[0]) {
+              return `Min Duration: ${v[0]}`;
+            } else if (v[1]) {
+              return `Max Duration: ${v[1]}`;
+            }
+            return [];
+          },
+          update: (filterList, filterPos, index) => {
+            if (filterPos === 0) {
+              filterList[index].splice(filterPos, 1, '');
+            } else if (filterPos === 1) {
+              filterList[index].splice(filterPos, 1);
+            } else if (filterPos === -1) {
+              filterList[index] = [];
+            }
+            return filterList;
+          },
+        },
+        filterOptions: {
+          names: [],
+          logic(duration, filters) {
+            if (filters[0] && filters[1]) {
+              return duration <= filters[0] || duration >= filters[1];
+            } else if (filters[0]) {
+              return duration <= filters[0];
+            } else if (filters[1]) {
+              return duration >= filters[1];
+            }
+            return false;
+          },
+          display: (filterList, onChange, index, column) => (
+            <div>
+              <FormLabel>Duration(seconds)</FormLabel>
+              <FormGroup row>
+                <TextField
+                  label='min'
+                  type='number'
+                  value={filterList[index][0] || ''}
+                  onChange={event => {
+                    filterList[index][0] = event.target.value;
+                    onChange(filterList[index], index, column);
+                  }}
+                  style={{ width: '45%', marginRight: '5%' }}
+                />
+                <TextField
+                  label='max'
+                  type='number'
+                  value={filterList[index][1] || ''}
+                  onChange={event => {
+                    filterList[index][1] = event.target.value;
+                    onChange(filterList[index], index, column);
+                  }}
+                  style={{ width: '45%' }}
+                />
+              </FormGroup>
+            </div>
+          ),
+        },
+        searchable: false,
+        sort: true,
+      }
+    },
+    {
+      name: "recievername",
+      label: "Reciever",
+      options: {
+        filter: true,
+        customFilterListOptions: {
+          render: v => `Reciever: ${v}`
+        },
+        filterType: 'textField',
+        sort: true,
+      }
+    },
+  ];
 
-  const handleChangePage = (event, newPage) => {
-    setPage(newPage)
-  }
-
-  const handleChangeRowsPerPage = (event) => {
-    setRowsPerPage(+event.target.value)
-    setPage(0)
-  }
-
-  const handleEdit = (pandit) => {
-    setOpenEdit(pandit);
-  }
-
-  const handleChange = (pandit, selected) => {
-    // change active status of panditselected
-    firebase.firestore().collection('pandits').doc(pandit.uid).set({ active: selected }, { merge: true });
+  const options = {
+    print: false,
+    rowsPerPageOptions: [10, 15, 20],
+    selectableRows: 'none',
+    downloadOptions: {
+      filename: 'callList.csv',
+      separator: ',',
+      filterOptions: {
+        useDisplayedRowsOnly: true
+      }
+    },
   };
 
   return (
@@ -73,79 +162,14 @@ const History = () => {
         />
       </div>
       <Card elevation={6} className="px-6 py-5 h-full">
-        <div className="flex justify-between items-center">
-          <div
-            className={classList({
-              'card-title': true,
-              'mb-4': true,
-            })}
-          >
-            All Calls
-          </div>
-          
-        </div>
         <div className="w-full overflow-auto">
         {callList.length ? 
-        <div>
-          <Table className="whitespace-pre">
-            <TableHead>
-              <TableRow>
-                <TableCell className="px-0">User</TableCell>
-                <TableCell className="px-0">Duration</TableCell>
-                <TableCell className="px-0">Reciever</TableCell>
-
-              </TableRow>
-            </TableHead>
-            <TableBody>
-              {callList
-                .slice(
-                  page * rowsPerPage,
-                  page * rowsPerPage + rowsPerPage
-                )
-                .map((call, index) => (
-                  <TableRow key={index}>
-                   
-                    <TableCell
-                      className="px-0 capitalize"
-                      align="left"
-                    >
-                      {call.callername}
-                    </TableCell>
-                    <TableCell
-                      className="px-0 capitalize"
-                      align="left"
-                    >
-                      {call.minutes} Mins {call.seconds} Seconds
-                    </TableCell>
-                    <TableCell
-                      className="px-0 capitalize"
-                      align="left"
-                    >
-                      {call.recievername}
-                    </TableCell>
-                    
-                  </TableRow>
-                ))}
-            </TableBody>
-          </Table>
-
-          <TablePagination
-            className="px-4"
-            rowsPerPageOptions={[5, 10, 25]}
-            component="div"
-            count={callList.length}
-            rowsPerPage={rowsPerPage}
-            page={page}
-            backIconButtonProps={{
-              'aria-label': 'Previous Page',
-            }}
-            nextIconButtonProps={{
-              'aria-label': 'Next Page',
-            }}
-            onChangePage={handleChangePage}
-            onChangeRowsPerPage={handleChangeRowsPerPage}
+          <MUIDataTable
+            title={"All Calls"}
+            data={callList}
+            columns={columns}
+            options={options}
           />
-          </div>
           : <p>No call records found for now!</p>}
         </div>
       </Card>

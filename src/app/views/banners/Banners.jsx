@@ -1,16 +1,10 @@
 import React, { useState, useEffect } from 'react'
-import { Breadcrumb } from 'app/components'
 import firebase from 'config.js'
-import { classList } from 'utils'
 import { ValidatorForm, TextValidator } from 'react-material-ui-form-validator'
 import {
-    Dialog,
     DialogActions,
     DialogContent,
-    DialogTitle,
-    MenuItem,
     Button,
-    CircularProgress,
   } from '@material-ui/core'
 
 const Banners = () => {
@@ -40,9 +34,9 @@ const Banners = () => {
   }, [])
 
 
-  const uploadFile = (e) => {
+  // const uploadFile = (e) => {
 
-  }
+  // }
 
   async function handleSubmit(e) {
     e.preventDefault();

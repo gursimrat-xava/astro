@@ -1,26 +1,22 @@
 import React, { useState, useEffect } from 'react'
 import { Breadcrumb } from 'app/components'
 import firebase from 'config.js'
-import { classList } from 'utils'
 import {
   Avatar,
   Card,
-  Button,
+  FormLabel,
+  FormGroup,
+  TextField,
   IconButton,
   Switch,
-  Table,
-  TableHead,
-  TableBody,
-  TableRow,
-  TableCell,
   Icon,
-  TablePagination,
 } from '@material-ui/core'
+import Tooltip from "@material-ui/core/Tooltip";
+import AddIcon from "@material-ui/icons/Add";
+import MUIDataTable from "mui-datatables";
 import Add from './Add'
 
 const List = () => {
-  const [rowsPerPage, setRowsPerPage] = useState(5)
-  const [page, setPage] = useState(0)
   const [openAdd, setOpenAdd] = useState(false)
   const [openEdit, setOpenEdit] = useState(null)
   const [userList, setUserList] = useState([])
@@ -29,20 +25,15 @@ const List = () => {
     firebase.firestore().collection('users').onSnapshot((users) => {
       const data = []
       users.forEach((user) => {
-        data.push(user.data())
+        const tempData = user.data();
+        tempData.active = tempData.active ? 'Active' : 'Inactive';
+        data.push(tempData)
       })
       setUserList(data);
     })
   }, [])
 
-  const handleChangePage = (event, newPage) => {
-    setPage(newPage)
-  }
-
-  const handleChangeRowsPerPage = (event) => {
-    setRowsPerPage(+event.target.value)
-    setPage(0)
-  }
+  
 
   const handleEdit = (user) => {
     setOpenEdit(user);
@@ -51,6 +42,202 @@ const List = () => {
   const handleChange = (user, selected) => {
     // change active status of userselected
     firebase.firestore().collection('users').doc(user.uid).set({ active: selected }, { merge: true });
+  };
+
+  const columns = [
+    {
+      name: "firstName",
+      label: "Name",
+      options: {
+        customBodyRenderLite: (dataIndex) => {
+          const user = userList[dataIndex];
+          return (
+            <div className="flex justify-start items-center">
+              {
+                user.pic ?
+                  <Avatar alt={user.firstName} src={user.pic} />
+                  :
+                  <Avatar>{user.firstName[0].toUpperCase()}</Avatar>
+              }
+              <span className="text-16 font-bold ml-2">{user.firstName}</span>
+            </div>
+          )
+        },
+        customFilterListOptions: {
+          render: v => `Name: ${v}`
+        },
+        filter: true,
+        filterType: 'textField',
+        sort: true,
+      }
+    },
+    {
+      name: "uid",
+      label: "UID",
+      options: {
+        customFilterListOptions: {
+          render: v => `UID: ${v}`
+        },
+        filter: true,
+        filterType: 'textField',
+      }
+    },
+    {
+      name: "languages",
+      label: "Languages",
+      options: {
+        // {user.languages && user.languages.join(', ')}
+        customBodyRenderLite: (dataIndex) => {
+          const user = userList[dataIndex];
+          return user.languages && user.languages.join(', ');
+        },
+        customFilterListOptions: {
+          render: v => `Languages: ${v}`
+        },
+        filter: true,
+        filterType: 'multiselect',
+        sort: false,
+      }
+    },
+    {
+      name: "credits",
+      label: "Credits",
+      options: {
+        filter: true,
+        filterType: 'custom',
+        customFilterListOptions: {
+          render: v => {
+            if (v[0] && v[1]) {
+              return `Min Credits: ${v[0]}, Max Credits: ${v[1]}`;
+            } else if (v[0]) {
+              return `Min Credits: ${v[0]}`;
+            } else if (v[1]) {
+              return `Max Credits: ${v[1]}`;
+            }
+            return [];
+          },
+          update: (filterList, filterPos, index) => {
+            if (filterPos === 0) {
+              filterList[index].splice(filterPos, 1, '');
+            } else if (filterPos === 1) {
+              filterList[index].splice(filterPos, 1);
+            } else if (filterPos === -1) {
+              filterList[index] = [];
+            }
+            return filterList;
+          },
+        },
+        filterOptions: {
+          names: [],
+          logic(credits, filters) {
+            if (filters[0] && filters[1]) {
+              return credits <= filters[0] || credits >= filters[1];
+            } else if (filters[0]) {
+              return credits <= filters[0];
+            } else if (filters[1]) {
+              return credits >= filters[1];
+            }
+            return false;
+          },
+          display: (filterList, onChange, index, column) => (
+            <div>
+              <FormLabel>Credits</FormLabel>
+              <FormGroup row>
+                <TextField
+                  label='min'
+                  type='number'
+                  value={filterList[index][0] || ''}
+                  onChange={event => {
+                    filterList[index][0] = event.target.value;
+                    onChange(filterList[index], index, column);
+                  }}
+                  style={{ width: '45%', marginRight: '5%' }}
+                />
+                <TextField
+                  label='max'
+                  type='number'
+                  value={filterList[index][1] || ''}
+                  onChange={event => {
+                    filterList[index][1] = event.target.value;
+                    onChange(filterList[index], index, column);
+                  }}
+                  style={{ width: '45%' }}
+                />
+              </FormGroup>
+            </div>
+          ),
+        },
+        searchable: false,
+        sort: true,
+      }
+    },
+    {
+      name: "active",
+      label: "Activity Status",
+      options: {
+        customBodyRenderLite: (dataIndex) => {
+          const user = userList[dataIndex];
+          return (
+            <Switch
+              checked={user.active === 'Active'}
+              onChange={(e) => handleChange(user, e.target.checked)}
+              color="primary"
+              name="active"
+            />
+          )
+        },
+        customFilterListOptions: {
+          render: v => `Activity Status: ${v}`
+        },
+        filter: true,
+        filterType: 'checkbox',
+        sort: false,
+      }
+    },
+    {
+      name: "edit",
+      label: "Actions",
+      options: {
+        customBodyRenderLite: (dataIndex) => {
+          const user = userList[dataIndex];
+          return (
+            <>
+              <IconButton onClick={() => handleEdit(user)}>
+                <Icon color="secondary">edit</Icon>
+              </IconButton>
+              {/* <IconButton>
+              <Icon color="error">close</Icon>
+              </IconButton> */}
+            </>
+          )
+        },
+        filter: false,
+        searchable: false,
+        sort: false,
+      }
+    },
+  ]
+
+  const options = {
+    print: false,
+    rowsPerPageOptions: [10, 15, 20],
+    selectableRows: 'none',
+    downloadOptions: {
+      filename: 'userList.csv',
+      separator: ',',
+      filterOptions: {
+        useDisplayedRowsOnly: true
+      }
+    },
+    customToolbar: () => {
+      return (
+        <Tooltip title={"Add User"}>
+          <IconButton onClick={() => setOpenAdd(true)}>
+            <AddIcon />
+          </IconButton>
+        </Tooltip>
+      );
+    }
   };
 
   return (
@@ -63,117 +250,12 @@ const List = () => {
         />
       </div>
       <Card elevation={6} className="px-6 py-5 h-full">
-        <div className="flex justify-between items-center">
-          <div
-            className={classList({
-              'card-title': true,
-              'mb-4': true,
-            })}
-          >
-            All Users
-          </div>
-          <Button
-            variant="outlined"
-            color="primary"
-            onClick={() => setOpenAdd(true)}
-          >
-            + Add User
-          </Button>
-        </div>
         <div className="w-full overflow-auto">
-          <Table className="whitespace-pre">
-            <TableHead>
-              <TableRow>
-                <TableCell className="px-0">Name</TableCell>
-                <TableCell className="px-0">UID</TableCell>
-                <TableCell className="px-0" align="center">Languages</TableCell>
-                <TableCell className="px-0" align="center">Credits</TableCell>
-                <TableCell className="px-0" align="center">Active</TableCell>
-                <TableCell className="px-0" align="center">Actions</TableCell>
-              </TableRow>
-            </TableHead>
-            <TableBody>
-              {userList
-                .slice(
-                  page * rowsPerPage,
-                  page * rowsPerPage + rowsPerPage
-                )
-                .map((user, index) => (
-                  <TableRow key={index}>
-                    <TableCell
-                      className="px-0 capitalize"
-                      align="left"
-                    >
-                      <div className="flex justify-start items-center">
-                        {
-                          user.pic ?
-                            <Avatar alt={user.firstName} src={user.pic} />
-                            :
-                            <Avatar>{user.firstName[0].toUpperCase()}</Avatar>
-                        }
-                        <span className="text-16 font-bold ml-2">{user.firstName}</span>
-                      </div>
-                    </TableCell>
-                    <TableCell
-                      className="px-0 capitalize"
-                      align="left"
-                    >
-                      {user.uid}
-                    </TableCell>
-                    <TableCell
-                      className="px-0 capitalize"
-                      align="center"
-                    >
-                      {user.languages && user.languages.join(', ')}
-                    </TableCell>
-                    <TableCell
-                      className="px-0 capitalize"
-                      align="center"
-                    >
-                      {user.credits}
-                    </TableCell>
-                    <TableCell
-                      className="px-0 capitalize"
-                      align="center"
-                    >
-                      <Switch
-                        checked={user.active}
-                        onChange={(e) => handleChange(user, e.target.checked)}
-                        color="primary"
-                        name="active"
-                      />
-                    </TableCell>
-                    <TableCell
-                      className="px-0 capitalize"
-                      align="center"
-                    >
-                      <IconButton onClick={() => handleEdit(user)}>
-                        <Icon color="secondary">edit</Icon>
-                      </IconButton>
-                      {/* <IconButton>
-                        <Icon color="error">close</Icon>
-                      </IconButton> */}
-                    </TableCell>
-                  </TableRow>
-                ))}
-            </TableBody>
-          </Table>
-
-          <TablePagination
-            className="px-4"
-            rowsPerPageOptions={[5, 10, 25]}
-            component="div"
-            count={userList.length}
-            rowsPerPage={rowsPerPage}
-            page={page}
-            backIconButtonProps={{
-              'aria-label': 'Previous Page',
-            }}
-            nextIconButtonProps={{
-              'aria-label': 'Next Page',
-            }}
-            onChangePage={handleChangePage}
-            onChangeRowsPerPage={handleChangeRowsPerPage}
+          <MUIDataTable
+            title={"All Users"}
+            data={userList}
+            columns={columns}
+            options={options}
           />
         </div>
       </Card>

@@ -8,7 +8,6 @@ import DialogTitle from '@material-ui/core/DialogTitle'
 import CircularProgress from '@material-ui/core/CircularProgress'
 import DateFnsUtils from '@date-io/date-fns'
 import firebase from 'config.js'
-import Grid from '@material-ui/core/Grid'
 import {
   MuiPickersUtilsProvider,
   KeyboardTimePicker,
