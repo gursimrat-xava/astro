@@ -4,6 +4,7 @@ import { Redirect } from 'react-router-dom'
 import dashboardRoutes from './views/dashboard/DashboardRoutes'
 import usersRoutes from './views/users/UsersRoutes'
 import panditsRoutes from './views/pandits/PanditsRoutes'
+import vendorsRoutes from './views/vendors/VendorsRoutes'
 import reportsRoutes from './views/reports/ReportsRoutes'
 import financeRoutes from './views/finance/financeRoutes'
 import bannerRoutes from './views/banners/BannerRoutes'
@@ -28,6 +29,7 @@ let routes = [
     ...redirectRoute,
     ...usersRoutes,
     ...panditsRoutes,
+    ...vendorsRoutes,
     ...bannerRoutes,
     ...reportsRoutes,
     ...financeRoutes,

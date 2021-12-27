@@ -34,11 +34,11 @@ const List = () => {
         tempData.active = tempData.active ? 'Active' : 'Inactive';
         data.push(tempData)
       })
-      data.sort((a, b) => {
-        const aName = a.name.toUpperCase();
-        const bName = b.name.toUpperCase();
-        return aName > bName ? 1 : aName < bName ? -1 : 0
-      })
+      // data.sort((a, b) => {
+      //   const aName = a.name.toUpperCase();
+      //   const bName = b.name.toUpperCase();
+      //   return aName > bName ? 1 : aName < bName ? -1 : 0
+      // })
       setPanditList(data);
     })
   }, [])

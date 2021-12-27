@@ -9,6 +9,11 @@ export const navigations = [
         type: 'label',
     },
     {
+        name: 'Vendors',
+        icon: 'format_list_bulleted',
+        path: '/vendors/list',
+    },
+    {
         name: 'Users',
         icon: 'people',
         path: '/users/list',
@@ -58,4 +63,5 @@ export const navigations = [
             },
         ],
     },
+
 ]
