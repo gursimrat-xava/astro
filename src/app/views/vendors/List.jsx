@@ -51,8 +51,8 @@ const List = () => {
 
   const columns = [
     {
-      name: "name",
-      label: "Name",
+      name: "Company",
+      label: "Company",
       options: {
         customBodyRenderLite: (dataIndex) => {
           const vendor = vendorList[dataIndex];
@@ -61,22 +61,34 @@ const List = () => {
 
               {
                 vendor.pic ?
-                  <Avatar alt={vendor.name} src={vendor.pic} />
+                  <Avatar alt={vendor.companyName} src={vendor.pic} />
                   :
-                  <Avatar>{vendor.name[0].toUpperCase()}</Avatar>
+                  <Avatar>{vendor.companyName[0].toUpperCase()}</Avatar>
               }
-                          <span className="text-16 font-bold ml-2">{vendor.name}</span>
+                          <span className="text-16 font-bold ml-2">{vendor.companyName}</span>
             </div>
           )
         },
         customFilterListOptions: {
-          render: v => `Name: ${v}`
+          render: v => `Company: ${v}`
         },
         filter: true,
         filterType: 'textField',
         sort: true,
       }
     },
+    {
+        name: "username",
+        label: "username",
+        options: {
+            customFilterListOptions: {
+              render: v => `username: ${v}`
+            },
+            filter: true,
+            filterType: 'textField',
+          }
+        
+      },
     {
       name: "uid",
       label: "UID",

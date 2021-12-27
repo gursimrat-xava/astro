@@ -14,7 +14,7 @@ import firebase from 'config.js'
 const Add = ({ open, setOpen, edit, editPandit }) => {
   const [email, setEmail] = useState(editPandit.email)
   const [phone, setPhone] = useState(editPandit.phone)
-  const [name, setName] = useState(editPandit.name)
+  const [companyName, setCompanyName] = useState(editPandit.companyName)
   const [password, setPassword] = useState(editPandit.password)
   const [address, setAddress] = useState(editPandit.address)
   const [username, setUsername] = useState(editPandit.username)
@@ -36,7 +36,7 @@ const Add = ({ open, setOpen, edit, editPandit }) => {
         await firebase.firestore().collection("vendors").doc(panditCredential.user.uid).set({
           email,
           phone,
-          name,
+          companyName,
           password,
           address,
           username,
@@ -52,7 +52,8 @@ const Add = ({ open, setOpen, edit, editPandit }) => {
       }
       else {
         await firebase.firestore().collection("vendors").doc(editPandit.uid).set({
-          name,
+          companyName,
+          username,
           address,
           bankAcc,
           ifsc,
@@ -124,13 +125,13 @@ const Add = ({ open, setOpen, edit, editPandit }) => {
           }
           <TextValidator
             margin="dense"
-            label="Name*"
+            label="companyName*"
             type="text"
-            name="name"
-            value={name || ''}
-            onChange={(e) => setName(e.target.value)}
+            name="companyName"
+            value={companyName || ''}
+            onChange={(e) => setCompanyName(e.target.value)}
             validators={['required', 'trim']}
-            errorMessages={['Name field is required', 'Name field is not valid']}
+            errorMessages={['companyName field is required', 'companyName field is not valid']}
             variant="outlined"
             fullWidth
           />
