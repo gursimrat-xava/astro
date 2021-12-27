@@ -16,6 +16,12 @@ import Tooltip from "@material-ui/core/Tooltip";
 import AddIcon from "@material-ui/icons/Add";
 import MUIDataTable from "mui-datatables";
 import Add from './Add'
+import {
+  MuiPickersUtilsProvider,
+  KeyboardDateTimePicker,
+} from '@material-ui/pickers'
+import 'date-fns'
+import DateFnsUtils from '@date-io/date-fns'
 
 const List = () => {
   const [openAdd, setOpenAdd] = useState(false)
@@ -29,16 +35,10 @@ const List = () => {
       pandits.forEach((pandit) => {
         // data.push(pandit.data())
         const tempData = pandit.data();
-        tempData.createdAt= tempData.createdAt.toDate();
-        tempData.createdAt= tempData.createdAt.toLocaleString('en-US');
+        tempData.createdAt = new Date(tempData.createdAt.seconds * 1000);
         tempData.active = tempData.active ? 'Active' : 'Inactive';
         data.push(tempData)
       })
-      // data.sort((a, b) => {
-      //   const aName = a.name.toUpperCase();
-      //   const bName = b.name.toUpperCase();
-      //   return aName > bName ? 1 : aName < bName ? -1 : 0
-      // })
       setPanditList(data);
     })
   }, [])
@@ -51,9 +51,9 @@ const List = () => {
     setOpenEdit(pandit);
   }
 
-  const handleChange = (pandit, selected) => {
+  const handleChange = (pandit, data) => {
     // change active status of panditselected
-    firebase.firestore().collection('pandits').doc(pandit.uid).set({ active: selected }, { merge: true });
+    firebase.firestore().collection('pandits').doc(pandit.uid).set(data, { merge: true });
   };
 
   const columns = [
@@ -96,14 +96,95 @@ const List = () => {
     },
     {
       name: "createdAt",
-      label: "createdAt",
+      label: "Created At",
       options: {
-        customFilterListOptions: {
-          render: v => `createdAt: ${v}`
+        customBodyRenderLite: (dataIndex, rowIndex) => {
+          const createdAt = panditList[dataIndex].createdAt
+          return `${createdAt.toDateString()} ${createdAt.getHours()}:${createdAt.getMinutes()}`;
         },
-        filter: false,
+        filter: true,
+        filterType: 'custom',
+        customFilterListOptions: {
+          render: v => {
+            if (v[0] && v[1]) {
+              return `Min Created At: ${v[0].toDateString()} ${v[0].getHours()}:${v[0].getMinutes()}, Max Created At: ${v[1].toDateString()} ${v[1].getHours()}:${v[1].getMinutes()}`;
+            } else if (v[0]) {
+              return `Min Created At: ${v[0].toDateString()} ${v[0].getHours()}:${v[0].getMinutes()}`;
+            } else if (v[1]) {
+              return `Max Created At: ${v[1].toDateString()} ${v[1].getHours()}:${v[1].getMinutes()}`;
+            }
+            return [];
+          },
+          update: (filterList, filterPos, index) => {
+            if (filterPos === 0) {
+              filterList[index].splice(filterPos, 1, '');
+            } else if (filterPos === 1) {
+              filterList[index].splice(filterPos, 1);
+            } else if (filterPos === -1) {
+              filterList[index] = [];
+            }
+            return filterList;
+          },
+        },
+        filterOptions: {
+          names: [],
+          logic(startTime, filters) {
+            console.log(startTime, filters)
+            if (filters[0] && filters[1]) {
+              return startTime <= filters[0] || startTime >= filters[1];
+            } else if (filters[0]) {
+              return startTime <= filters[0];
+            } else if (filters[1]) {
+              return startTime >= filters[1];
+            }
+            return false;
+          },
+          display: (filterList, onChange, index, column) => (
+            <div>
+              <FormLabel>Start Date Time</FormLabel>
+              <FormGroup row>
+                <MuiPickersUtilsProvider
+                  utils={DateFnsUtils}
+                >
+                  <KeyboardDateTimePicker
+                    style={{ width: '45%', marginRight: '5%' }}
+                    margin="dense"
+                    label="min"
+                    type="text"
+                    size="small"
+                    autoOk={true}
+                    value={filterList[index][0] || null}
+                    format="MMM dd, yyyy HH:mm"
+                    onChange={date => {
+                      filterList[index][0] = date;
+                      onChange(filterList[index], index, column);
+                    }}
+                  />
+                </MuiPickersUtilsProvider>
+                <MuiPickersUtilsProvider
+                  utils={DateFnsUtils}
+                >
+                  <KeyboardDateTimePicker
+                    style={{ width: '45%', marginRight: '5%' }}
+                    margin="dense"
+                    label="max"
+                    type="text"
+                    size="small"
+                    autoOk={true}
+                    value={filterList[index][1] || null}
+                    format="MMM dd, yyyy HH:mm"
+                    onChange={date => {
+                      filterList[index][1] = date;
+                      onChange(filterList[index], index, column);
+                    }}
+                  />
+                </MuiPickersUtilsProvider>
+              </FormGroup>
+            </div>
+          ),
+        },
+        searchable: false,
         sort: true,
-        filterType: 'textField',
       }
     },
     {
@@ -203,7 +284,7 @@ const List = () => {
           return (
             <Switch
               checked={pandit.active === 'Active'}
-              onChange={(e) => handleChange(pandit, e.target.checked)}
+              onChange={(e) => handleChange(pandit, { active: e.target.checked })}
               color="primary"
               name="active"
             />
@@ -227,11 +308,11 @@ const List = () => {
             <>
             {
               <div className="flex justify-center">
-                <IconButton disabled = {!pandit.isOnline}>
-                <Icon style={pandit.isOnline ? {color: "#22BB33"} : {}}>chat</Icon>
+                <IconButton onClick={(e) => handleChange(pandit, { chatAvailable: !pandit.chatAvailable })}>
+                <Icon style={pandit.chatAvailable ? {color: "#22BB33"} : {}}>chat</Icon>
                 </IconButton>
-                <IconButton disabled = {!pandit.isOnline}>
-                <Icon style={pandit.isOnline ? {color: "#22BB33"} : {}}>call</Icon>
+                <IconButton onClick={(e) => handleChange(pandit, { callAvailable: !pandit.callAvailable })}>
+                <Icon style={pandit.callAvailable ? {color: "#22BB33"} : {}}>call</Icon>
                 </IconButton>
               </div>
             }

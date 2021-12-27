@@ -8,9 +8,6 @@ import {
   IconButton,
   Switch,
   Icon,
-  FormLabel,
-  FormGroup,
-  TextField,
 } from '@material-ui/core'
 import Tooltip from "@material-ui/core/Tooltip";
 import AddIcon from "@material-ui/icons/Add";
