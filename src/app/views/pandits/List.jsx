@@ -24,11 +24,13 @@ const List = () => {
   const history = useHistory();
 
   useEffect(() => {
-    firebase.firestore().collection('pandits').onSnapshot((pandits) => {
+    firebase.firestore().collection('pandits').orderBy('createdAt','desc').onSnapshot((pandits) => {
       const data = []
       pandits.forEach((pandit) => {
         // data.push(pandit.data())
         const tempData = pandit.data();
+        tempData.createdAt= tempData.createdAt.toDate();
+        tempData.createdAt= tempData.createdAt.toLocaleString('en-US');
         tempData.active = tempData.active ? 'Active' : 'Inactive';
         data.push(tempData)
       })
@@ -89,6 +91,18 @@ const List = () => {
           render: v => `UID: ${v}`
         },
         filter: true,
+        filterType: 'textField',
+      }
+    },
+    {
+      name: "createdAt",
+      label: "createdAt",
+      options: {
+        customFilterListOptions: {
+          render: v => `createdAt: ${v}`
+        },
+        filter: false,
+        sort: true,
         filterType: 'textField',
       }
     },

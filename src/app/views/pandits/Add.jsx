@@ -80,7 +80,8 @@ const Add = ({ open, setOpen, edit, editPandit }) => {
           balanceConsumed : 0,
           minutesConsumed : 0,
           chatsReplied : 0,
-          uid: panditCredential.user.uid
+          uid: panditCredential.user.uid,
+          createdAt:  new Date(),
         })
       }
       else {

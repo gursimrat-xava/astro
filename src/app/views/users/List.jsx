@@ -22,10 +22,14 @@ const List = () => {
   const [userList, setUserList] = useState([])
 
   useEffect(() => {
-    firebase.firestore().collection('users').onSnapshot((users) => {
+    firebase.firestore().collection('users').orderBy('createdAt', 'desc').onSnapshot((users) => {
       const data = []
+      debugger;
+      console.log(users);
       users.forEach((user) => {
         const tempData = user.data();
+       tempData.createdAt= tempData.createdAt.toDate();
+       tempData.createdAt= tempData.createdAt.toLocaleString('en-US');
         tempData.active = tempData.active ? 'Active' : 'Inactive';
         data.push(tempData)
       })
@@ -79,6 +83,18 @@ const List = () => {
           render: v => `UID: ${v}`
         },
         filter: true,
+        filterType: 'textField',
+      }
+    },
+    {
+      name: "createdAt",
+      label: "createdAt",
+      options: {
+        customFilterListOptions: {
+          render: v => `createdAt: ${v}`
+        },
+        filter: false,
+        sort: true,
         filterType: 'textField',
       }
     },
