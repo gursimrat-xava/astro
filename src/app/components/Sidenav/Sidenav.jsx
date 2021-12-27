@@ -1,6 +1,7 @@
-import React, { Fragment } from 'react'
+import React, { Fragment, useState, useEffect, useContext } from 'react'
+import { AuthContext } from 'app/auth/AuthGuard'
 import Scrollbar from 'react-perfect-scrollbar'
-import { navigations } from 'app/navigations'
+import mainNavigations from 'app/navigations'
 import { MatxVerticalNav } from 'app/components'
 import { makeStyles } from '@material-ui/core/styles'
 import clsx from 'clsx'
@@ -30,6 +31,18 @@ const Sidenav = ({ children }) => {
     const classes = useStyles()
     const { settings, updateSettings } = useSettings()
 
+    const [navigation, setNavigation] = useState(mainNavigations.navigations);
+    const [user, setUser] = useState(JSON.parse(localStorage.getItem("user")));
+    const { currentUser } = useContext(AuthContext);
+    
+    useEffect(() => {
+        setUser(JSON.parse(localStorage.getItem("user")));
+    }, [currentUser])
+
+    useEffect(() => {
+        setNavigation(user?.role !== 'vendor' ? mainNavigations.navigations : mainNavigations.vendorNavigations);
+    }, [user])
+
     const updateSidebarMode = (sidebarSettings) => {
         let activeLayoutSettingsName = settings.activeLayout + 'Settings'
         let activeLayoutSettings = settings[activeLayoutSettingsName]
@@ -53,7 +66,7 @@ const Sidenav = ({ children }) => {
                 className={clsx('relative px-4', classes.scrollable)}
             >
                 {children}
-                <MatxVerticalNav items={navigations} />
+                <MatxVerticalNav items={navigation} />
             </Scrollbar>
 
             <div

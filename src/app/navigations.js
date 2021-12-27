@@ -1,4 +1,4 @@
-export const navigations = [
+const navigations = [
     {
         name: 'Home',
         path: '/home',
@@ -17,25 +17,11 @@ export const navigations = [
         name: 'Users',
         icon: 'people',
         path: '/users/list',
-        // children: [
-        //     {
-        //         name: 'User List',
-        //         iconText: 'UL',
-        //         path: '/users/list',
-        //     },
-        // ],
     },
     {
         name: 'Pandits',
         icon: 'format_list_bulleted',
         path: '/pandits/list',
-        // children: [
-        //     {
-        //         name: 'Pandit List',
-        //         iconText: 'PL',
-        //         path: '/pandits/list',
-        //     },
-        // ],
     },
     {
         name: 'Banners',
@@ -65,3 +51,22 @@ export const navigations = [
     },
 
 ]
+
+const vendorNavigations = [
+    {
+        name: 'Home',
+        path: '/home',
+        icon: 'home',
+    },
+    {
+        label: 'Pages',
+        type: 'label',
+    },
+    {
+        name: 'Pandits',
+        icon: 'format_list_bulleted',
+        path: '/pandits/list',
+    },
+]
+
+export default {navigations, vendorNavigations};

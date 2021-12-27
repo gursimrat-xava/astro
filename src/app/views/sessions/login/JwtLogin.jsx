@@ -4,6 +4,7 @@ import {
   Grid,
   Button,
   CircularProgress,
+  MenuItem,
 } from '@material-ui/core'
 import { TextValidator, ValidatorForm } from 'react-material-ui-form-validator'
 import firebase from 'config.js';
@@ -35,6 +36,7 @@ const JwtLogin = () => {
   const [userInfo, setUserInfo] = useState({
     email: '',
     password: '',
+    role: 'admin'
   })
   const [message, setMessage] = useState('')
 
@@ -46,22 +48,44 @@ const JwtLogin = () => {
     setUserInfo(temp)
   }
 
-  const handleFormSubmit = async (event) => {
-    setLoading(true)
+  const signIn = () => {
+    localStorage.setItem("user", JSON.stringify({ role: userInfo.role }));
     firebase.auth().signInWithEmailAndPassword(userInfo.email, userInfo.password).then((user) => {
-      localStorage.setItem("user", user);
-      firebase.firestore().collection("superadmin").doc("superadmin").get().then(doc => {
-        if (user.user.email !== doc.data().email) {
-          firebase.auth().signOut();
-        }
-      })
+      localStorage.setItem("user", JSON.stringify({ ...user, role: userInfo.role }));
       setLoading(false);
-      history.push(process.env.PUBLIC_URL + '/')
+      history.push(userInfo.role!=='vendor' ? process.env.PUBLIC_URL + '/' : process.env.PUBLIC_URL + '/pandits/list')
     }).catch(e => {
       console.log("error singing in ", e);
       setMessage(e.message)
       setLoading(false);
     });
+  }
+
+
+  const handleFormSubmit = (event) => {
+    setLoading(true)
+    if(userInfo.role === 'admin') {
+      firebase.firestore().collection("superadmin").doc("superadmin").get().then(doc => {
+        if (userInfo.email !== doc.data().email) {
+          firebase.auth().signOut();
+          setLoading(false)
+        }
+        else {
+          signIn();
+        }
+      })
+    }
+    else if(userInfo.role === 'vendor') {
+      firebase.firestore().collection("vendors").where('email', '==', userInfo.email).get().then(doc => {
+        if (userInfo.email !== doc.docs[0].data().email) {
+          firebase.auth().signOut();
+          setLoading(false)
+        }
+        else {
+          signIn();
+        }
+      })
+    }
   }
 
   return (
@@ -101,7 +125,7 @@ const JwtLogin = () => {
                   ]}
                 />
                 <TextValidator
-                  className="mb-3 w-full"
+                  className="mb-6 w-full"
                   label="Password"
                   variant="outlined"
                   size="small"
@@ -112,6 +136,23 @@ const JwtLogin = () => {
                   validators={['required']}
                   errorMessages={['this field is required']}
                 />
+                <TextValidator
+                  className="mb-3 w-full"
+                  label="Role"
+                  variant="outlined"
+                  size="small"
+                  onChange={handleChange}
+                  name="role"
+                  select
+                  value={userInfo.role}
+                >
+                  <MenuItem value="admin">
+                    Admin
+                  </MenuItem>
+                  <MenuItem value="vendor">
+                    Vendor
+                  </MenuItem>
+                </TextValidator>
 
                 {message && (
                   <p className="text-error">{message}</p>

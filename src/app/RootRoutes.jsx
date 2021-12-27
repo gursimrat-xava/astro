@@ -41,4 +41,14 @@ let routes = [
 ]
 routes = routes.map(route => { return { ...route, path: process.env.PUBLIC_URL + route.path}})
 
-export default routes
+let vendorRootRoutes = [
+    ...dashboardRoutes,
+    ...redirectRoute,
+    ...panditsRoutes,
+    ...errorRoute
+]
+vendorRootRoutes = vendorRootRoutes.map(route => { return { ...route, path: process.env.PUBLIC_URL + route.path}})
+
+const mainRoutes = {routes, vendorRootRoutes}
+
+export default mainRoutes
