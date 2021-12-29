@@ -32,7 +32,7 @@ const Add = ({ open, setOpen, edit, editPandit, setOpenBulkAdd }) => {
 
   const [loading, setLoading] = useState(false)
   const { currentUser } = useContext(AuthContext);
-  console.log('currentUser', currentUser);
+ 
 
   ValidatorForm.addValidationRule('isLanguageFilled', (value) => {
     if (languages && languages.length !== 0) {
@@ -85,6 +85,7 @@ const Add = ({ open, setOpen, edit, editPandit, setOpenBulkAdd }) => {
           chatsReplied : 0,
           uid: panditCredential.user.uid,
           createdAt:  new Date(),
+          vendorEmail: currentUser.email,
         })
       }
       else {
