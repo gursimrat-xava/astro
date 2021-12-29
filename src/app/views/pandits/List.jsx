@@ -16,6 +16,7 @@ import Tooltip from "@material-ui/core/Tooltip";
 import AddIcon from "@material-ui/icons/Add";
 import MUIDataTable from "mui-datatables";
 import Add from './Add'
+import BulkAdd from './BulkAdd'
 import {
   MuiPickersUtilsProvider,
   KeyboardDateTimePicker,
@@ -25,12 +26,19 @@ import DateFnsUtils from '@date-io/date-fns'
 
 const List = () => {
   const [openAdd, setOpenAdd] = useState(false)
+  const [openBulkAdd, setOpenBulkAdd] = useState(false)
   const [openEdit, setOpenEdit] = useState(null)
   const [panditList, setPanditList] = useState([])
   const history = useHistory();
+  const user = JSON.parse(localStorage.getItem('user'));
 
   useEffect(() => {
-    firebase.firestore().collection('pandits').orderBy('createdAt','desc').onSnapshot((pandits) => {
+    console.log(user)
+    let panditQuery = firebase.firestore().collection('pandits');
+    if(user.role !== 'admin'){
+      panditQuery = panditQuery.where('vendorEmail', '==', user.user.email)
+    }
+    panditQuery.orderBy('createdAt','desc').onSnapshot((pandits) => {
       const data = []
       pandits.forEach((pandit) => {
         // data.push(pandit.data())
@@ -390,7 +398,10 @@ const List = () => {
         </div>
       </Card>
       {
-        openAdd && <Add open={openAdd} setOpen={setOpenAdd} />
+        openAdd && <Add open={openAdd} setOpen={setOpenAdd} setOpenBulkAdd={setOpenBulkAdd} />
+      }
+      {
+        openBulkAdd && <BulkAdd open={openBulkAdd} setOpen={setOpenBulkAdd} setOpenAdd={setOpenAdd} />
       }
       {
         openEdit && <Add open={openEdit != null} setOpen={setOpenEdit} edit editPandit={openEdit} />

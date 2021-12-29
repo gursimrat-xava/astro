@@ -13,7 +13,7 @@ import Autocomplete from '@material-ui/lab/Autocomplete'
 import firebase from 'config.js'
 import { AuthContext } from '../../auth/AuthGuard'
 
-const Add = ({ open, setOpen, edit, editPandit }) => {
+const Add = ({ open, setOpen, edit, editPandit, setOpenBulkAdd }) => {
   const [email, setEmail] = useState(editPandit.email)
   const [phone, setPhone] = useState(editPandit.phone)
   const [name, setName] = useState(editPandit.name)
@@ -344,23 +344,38 @@ const Add = ({ open, setOpen, edit, editPandit }) => {
           }
 
         </DialogContent>
-        <DialogActions className="mb-4">
-          <Button
-            variant="outlined"
-            color="secondary"
-            onClick={handleClose}
-          >
-            Cancel
-          </Button>
-          {loading ?
-            <Button className="mx-4" type="submit" variant="contained" color="primary">
-              <CircularProgress size={24} />
-            </Button>
-            :
-            <Button className="mx-4" type="submit" variant="contained" color="primary">
-              {edit ? 'Save' : 'Add'}
+        <DialogActions className={`mb-4 ${!edit && 'flex flex-row justify-between'}`}>
+          {!edit && 
+            <Button 
+              className="mx-4"
+              variant="contained"
+              color="primary"
+              onClick={() => {
+                handleClose();
+                setOpenBulkAdd(true);
+              }}
+            >
+              Bulk Add
             </Button>
           }
+          <div>
+            <Button
+              variant="outlined"
+              color="secondary"
+              onClick={handleClose}
+            >
+              Cancel
+            </Button>
+            {loading ?
+              <Button className="mx-4" type="submit" variant="contained" color="primary">
+                <CircularProgress size={24} />
+              </Button>
+              :
+              <Button className="mx-4" type="submit" variant="contained" color="primary">
+                {edit ? 'Save' : 'Add'}
+              </Button>
+            }
+          </div>
         </DialogActions>
       </ValidatorForm>
     </Dialog>
