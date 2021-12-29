@@ -75,6 +75,7 @@ const BulkAdd = ({ open, setOpen, setOpenAdd }) => {
     }
 
     const uploadFile = (files) => {
+        setLoading(true)
         var reader = new FileReader()
         reader.readAsText(files[0])
         reader.onload = async (e) => {
@@ -90,6 +91,7 @@ const BulkAdd = ({ open, setOpen, setOpenAdd }) => {
                     }
                 }
             }
+            setLoading(false)
         }
     }
 
@@ -109,19 +111,28 @@ const BulkAdd = ({ open, setOpen, setOpenAdd }) => {
                         <i className="fas fa-arrow-down mr-2" /> DOWNLOAD SAMPLE
                     </Button>
 
-                    <ReactFileReader
-                        fileTypes={['.csv']}
-                        handleFiles={(files) => uploadFile(files)}
-                    >
-                        <Button
-                            className="m-3"
-                            variant="contained"
-                            color="primary"
+                    <div className={`${loading && 'hidden'}`}>
+                        <ReactFileReader
+                            fileTypes={['.csv']}
+                            handleFiles={(files) => uploadFile(files)}
                         >
-                            <i className="fas fa-arrow-up mr-2" /> UPLOAD
-                            SPREADSHEET
+                            <div className="w-full px-3">
+                                <Button
+                                    className="my-3 w-full"
+                                    variant="contained"
+                                    color="primary"
+                                >
+                                    <i className="fas fa-arrow-up mr-2" /> UPLOAD
+                                    SPREADSHEET
+                                </Button>
+                            </div>
+                        </ReactFileReader>
+                    </div>
+                    {loading && 
+                        <Button className="m-3" variant="contained" color="primary">
+                            <CircularProgress size={24} color="inherit" />
                         </Button>
-                    </ReactFileReader>
+                    }
                 </div>
             </DialogContent>
             <DialogActions className="mb-4 flex flex-row justify-between">

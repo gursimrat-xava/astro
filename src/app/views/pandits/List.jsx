@@ -390,11 +390,11 @@ const List = () => {
       <Card elevation={6} className="px-6 py-5 h-full">
         <div className="w-full overflow-auto">
           <MUIDataTable
-              title={"All Pandits"}
-              data={panditList}
-              columns={columns}
-              options={options}
-            />
+            title={"All Pandits"}
+            data={panditList}
+            columns={columns}
+            options={options}
+          />
         </div>
       </Card>
       {
