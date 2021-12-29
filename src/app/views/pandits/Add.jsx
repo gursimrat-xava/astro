@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useState, useContext } from 'react'
 import { ValidatorForm, TextValidator } from 'react-material-ui-form-validator'
 import {
   Dialog,
@@ -11,6 +11,7 @@ import {
 } from '@material-ui/core'
 import Autocomplete from '@material-ui/lab/Autocomplete'
 import firebase from 'config.js'
+import { AuthContext } from '../../auth/AuthGuard'
 
 const Add = ({ open, setOpen, edit, editPandit }) => {
   const [email, setEmail] = useState(editPandit.email)
@@ -30,6 +31,8 @@ const Add = ({ open, setOpen, edit, editPandit }) => {
   const [accType, setAccType] = useState(editPandit.accType)
 
   const [loading, setLoading] = useState(false)
+  const { currentUser } = useContext(AuthContext);
+  console.log('currentUser', currentUser);
 
   ValidatorForm.addValidationRule('isLanguageFilled', (value) => {
     if (languages && languages.length !== 0) {

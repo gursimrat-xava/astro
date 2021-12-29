@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react'
 import { Breadcrumb } from 'app/components'
 import firebase from 'config.js'
-import { useHistory } from 'react-router-dom';
+//import { useHistory } from 'react-router-dom';
 import {
   Avatar,
   Card,
@@ -18,7 +18,7 @@ const List = () => {
   const [openAdd, setOpenAdd] = useState(false)
   const [openEdit, setOpenEdit] = useState(null)
   const [vendorList, setVendorList] = useState([])
-  const history = useHistory();
+  //const history = useHistory();
 
   useEffect(() => {
     firebase.firestore().collection('vendors').orderBy('createdAt','desc').onSnapshot((vendors) => {
