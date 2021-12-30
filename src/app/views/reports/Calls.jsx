@@ -21,7 +21,7 @@ const List = () => {
   const [callList, setCallList] = useState([])
   const columns = [
     {
-      name: "caller",
+      name: "callername",
       label: "User",
       options: {
         customFilterListOptions: {
@@ -33,7 +33,7 @@ const List = () => {
       }
     },
     {
-      name: "receiver",
+      name: "recievername",
       label: "Pandit",
       options: {
         filter: true,
@@ -45,12 +45,12 @@ const List = () => {
       }
     },
     {
-      name: "startTime",
+      name: "time",
       label: "Start Date Time",
       options: {
         customBodyRenderLite: (dataIndex, rowIndex) => {
-          const startTime = callList[dataIndex].startTime
-          return `${startTime.toDateString()} ${startTime.getHours()}:${startTime.getMinutes()}`;
+          const time = callList[dataIndex].time
+          return `${time.toDateString()} ${time.getHours()}:${time.getMinutes()}`;
         },
         filter: true,
         filterType: 'custom',
@@ -78,14 +78,14 @@ const List = () => {
         },
         filterOptions: {
           names: [],
-          logic(startTime, filters) {
-            console.log(startTime, filters)
+          logic(time, filters) {
+            console.log(time, filters)
             if (filters[0] && filters[1]) {
-              return startTime <= filters[0] || startTime >= filters[1];
+              return time <= filters[0] || time >= filters[1];
             } else if (filters[0]) {
-              return startTime <= filters[0];
+              return time <= filters[0];
             } else if (filters[1]) {
-              return startTime >= filters[1];
+              return time >= filters[1];
             }
             return false;
           },
@@ -307,22 +307,13 @@ const List = () => {
   };
 
   useEffect(() => {
-    firebase.firestore().collection('calls').onSnapshot((calls) => {
+    firebase.firestore().collectionGroup('panditCalls').orderBy('time', 'desc').onSnapshot((calls) => {
       setCallList([])
       calls.forEach((call) => {
-        console.log('call data', call.data());
         const callData = call.data()
-        callData.duration = callData.endTime - callData.startTime
-        callData.startTime = new Date(callData.startTime.seconds * 1000)
-        Promise.all([callData.caller.get(), callData.receiver.get()])
-          .then(([callerData, receiverData]) => {
-            callData.caller = callerData.data()
-            callData.caller = callData.caller.firstName + ' ' + callData.caller.lastName
-            callData.receiver = receiverData.data().name
-
-            setCallList(prevList => [...prevList, callData])
-          })
-          .catch(e => console.log('error fetching call list', e))
+        callData.duration = (callData.minutes*60) + callData.seconds;
+        callData.time = new Date(callData.time.seconds * 1000)
+        setCallList(prevList => [...prevList, callData])
       })
     })
   }, [])

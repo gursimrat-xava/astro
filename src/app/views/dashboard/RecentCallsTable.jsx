@@ -34,21 +34,14 @@ const RecentCallsTable = () => {
   const classes = useStyles()
 
   useEffect(() => {
-    firebase.firestore().collection('calls').onSnapshot((calls) => {
+    firebase.firestore().collectionGroup('panditCalls').orderBy('time', 'desc').onSnapshot((calls) => {
       setCallList([])
       calls.forEach((call) => {
         const callData = call.data()
-        const duration = callData.endTime - callData.startTime
+        const duration = (callData.minutes*60) + callData.seconds;
         callData.duration = `${duration<60 ? '' : duration/60+'m'} ${duration%60}s`
-
-        Promise.all([callData.caller.get(), callData.receiver.get()])
-        .then(([callerData, receiverData]) => {
-          callData.caller = callerData.data()
-          callData.receiver = receiverData.data()
-  
-          setCallList(prevList => [...prevList, callData])
-        })
-        .catch(e => console.log('error fetching call list', e))
+        callData.time = new Date(callData.time.seconds * 1000)
+        setCallList(prevList => [...prevList, callData])
       })
     })
   }, [])
@@ -89,19 +82,19 @@ const RecentCallsTable = () => {
                     className="px-6 capitalize"
                     align="left"
                   >
-                    {call.caller.firstName}
+                    {call.callername}
                   </TableCell>
                   <TableCell
                     className="px-0 capitalize"
                     align="left"
                   >
-                    {call.receiver.name}
+                    {call.recievername}
                   </TableCell>
                   <TableCell
                     className="px-0 capitalize"
                     align="center"
                   >
-                    {call.duration}
+                    {`${call.duration < 60 ? '' : call.duration / 60 + 'm'} ${call.duration % 60}s`}
                   </TableCell>
                   <TableCell
                     className="px-0 capitalize"
