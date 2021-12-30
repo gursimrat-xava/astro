@@ -110,6 +110,8 @@ const BulkAdd = ({ open, setOpen, setOpenAdd }) => {
                     </Button>
 
                     <ReactFileReader
+                        variant="contained"
+                        className="flex flex-column justify-between"
                         fileTypes={['.csv']}
                         handleFiles={(files) => uploadFile(files)}
                     >
