@@ -56,12 +56,31 @@ const Add = ({ open, setOpen, edit, editUser }) => {
         // }
         // reader.readAsDataURL(dataSend.profile_photo);
         await firebase.firestore().collection("users").doc(userCredential.user.uid).set({
-          email, firstName, lastName, languages, gender, dateOfBirth, timeOfBirth: timeOfBirth ? timeOfBirth.getHours() + ":" + timeOfBirth.getMinutes() : undefined, placeOfBirth, active: true, uid: userCredential.user.uid, credits: 0
+          email,
+          firstName,
+          lastName,
+          languages,
+          gender,
+          dateOfBirth,
+          timeOfBirth: timeOfBirth ? timeOfBirth.getHours() + ":" + timeOfBirth.getMinutes() : undefined,
+          placeOfBirth,
+          active: true,
+          uid: userCredential.user.uid,
+          credits: 0,
+          createdAt: new Date(),
         })
       }
       else {
         await firebase.firestore().collection("users").doc(editUser.uid).set({
-          email, firstName, lastName, languages, gender, dateOfBirth, timeOfBirth: timeOfBirth.getHours() + ":" + timeOfBirth.getMinutes(), placeOfBirth, credits
+          email,
+          firstName,
+          lastName,
+          languages,
+          gender,
+          dateOfBirth,
+          timeOfBirth: timeOfBirth ? timeOfBirth.getHours() + ":" + timeOfBirth.getMinutes() : undefined,
+          placeOfBirth,
+          credits,
         }, { merge: true })
       }
       setLoading(false)

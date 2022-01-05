@@ -66,7 +66,7 @@ const JwtLogin = () => {
     setLoading(true)
     if(userInfo.role === 'admin') {
       firebase.firestore().collection("superadmin").doc("superadmin").get().then(doc => {
-        if (userInfo.email !== doc.data().email) {
+        if (doc.empty || userInfo.email !== doc.data().email) {
           firebase.auth().signOut();
           setLoading(false)
         }
@@ -77,7 +77,7 @@ const JwtLogin = () => {
     }
     else if(userInfo.role === 'vendor') {
       firebase.firestore().collection("vendors").where('email', '==', userInfo.email).get().then(doc => {
-        if (userInfo.email !== doc.docs[0].data().email) {
+        if (doc.empty || userInfo.email !== doc.docs[0].data().email) {
           firebase.auth().signOut();
           setLoading(false)
         }

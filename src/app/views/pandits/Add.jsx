@@ -23,7 +23,7 @@ const Add = ({ open, setOpen, edit, editPandit, setOpenBulkAdd }) => {
   const [address, setAddress] = useState(editPandit.address)
   const [username, setUsername] = useState(editPandit.username)
   const [qualification, setQualification] = useState(editPandit.qualification)
-  const [specialities, setSpecialities] = useState(editPandit.speciality)
+  const [specialities, setSpecialities] = useState(editPandit.specialities)
   const [bankAcc, setBankAcc] = useState(editPandit.bankAcc)
   const [ifsc, setIfsc] = useState(editPandit.ifsc)
   const [bankName, setBankName] = useState(editPandit.bankName)
