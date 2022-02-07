@@ -106,7 +106,9 @@ const BulkAdd = ({ open, setOpen, setOpenAdd }) => {
                         className="m-3"
                         variant="outlined"
                         color="primary"
-                        onClick={() => {}}
+                        onClick={() => {
+                            window.open('https://firebasestorage.googleapis.com/v0/b/astroplus-c0e60.appspot.com/o/SamplePandits.csv?alt=media&token=18739331-2acf-45f3-be96-1bf41f464d6e', '_blank')
+                        }}
                     >
                         <i className="fas fa-arrow-down mr-2" /> DOWNLOAD SAMPLE
                     </Button>

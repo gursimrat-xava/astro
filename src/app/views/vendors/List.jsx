@@ -48,7 +48,7 @@ const List = () => {
 
   const columns = [
     {
-      name: "Company",
+      name: "companyName",
       label: "Company",
       options: {
         customBodyRenderLite: (dataIndex) => {
