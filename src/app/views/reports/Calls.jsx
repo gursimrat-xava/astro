@@ -307,7 +307,6 @@ const List = () => {
   };
 
   useEffect(() => {
-    alert("hi");
     debugger;
     firebase.firestore().collectionGroup('calls').orderBy('time', 'desc').onSnapshot((calls) => {
       setCallList([])
