@@ -34,13 +34,13 @@ const RecentCallsTable = () => {
   const classes = useStyles()
 
   useEffect(() => {
-    firebase.firestore().collectionGroup('panditCalls').orderBy('time', 'desc').onSnapshot((calls) => {
+    firebase.firestore().collectionGroup('callLogs').onSnapshot((calls) => {
       setCallList([])
       calls.forEach((call) => {
         const callData = call.data()
-        const duration = (callData.minutes*60) + callData.seconds;
+        /*const duration = (callData.minutes*60) + callData.seconds;
         callData.duration = `${duration<60 ? '' : duration/60+'m'} ${duration%60}s`
-        callData.time = new Date(callData.time.seconds * 1000)
+        callData.time = new Date(callData.time.seconds * 1000)*/
         setCallList(prevList => [...prevList, callData])
       })
     })
@@ -82,13 +82,13 @@ const RecentCallsTable = () => {
                     className="px-6 capitalize"
                     align="left"
                   >
-                    {call.callername}
+                    {call.callerName}
                   </TableCell>
                   <TableCell
                     className="px-0 capitalize"
                     align="left"
                   >
-                    {call.recievername}
+                    {call.receiverName}
                   </TableCell>
                   <TableCell
                     className="px-0 capitalize"

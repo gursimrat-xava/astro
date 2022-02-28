@@ -307,7 +307,9 @@ const List = () => {
   };
 
   useEffect(() => {
-    firebase.firestore().collectionGroup('panditCalls').orderBy('time', 'desc').onSnapshot((calls) => {
+    alert("hi");
+    debugger;
+    firebase.firestore().collectionGroup('calls').orderBy('time', 'desc').onSnapshot((calls) => {
       setCallList([])
       calls.forEach((call) => {
         const callData = call.data()
