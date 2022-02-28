@@ -47,6 +47,7 @@ const List = () => {
         tempData.active = tempData.active ? 'Active' : 'Inactive';
         data.push(tempData)
       })
+      console.log("pandits", data);
       setPanditList(data);
     })
   }, [])

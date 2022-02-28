@@ -21,7 +21,7 @@ const List = () => {
   const [callList, setCallList] = useState([])
   const columns = [
     {
-      name: "callername",
+      name: "callerName",
       label: "User",
       options: {
         customFilterListOptions: {
@@ -33,7 +33,7 @@ const List = () => {
       }
     },
     {
-      name: "recievername",
+      name: "receiverName",
       label: "Pandit",
       options: {
         filter: true,
@@ -45,11 +45,11 @@ const List = () => {
       }
     },
     {
-      name: "time",
+      name: "startTime",
       label: "Start Date Time",
       options: {
         customBodyRenderLite: (dataIndex, rowIndex) => {
-          const time = callList[dataIndex].time
+          const time = callList[dataIndex].startTime.toDate()
           return `${time.toDateString()} ${time.getHours()}:${time.getMinutes()}`;
         },
         filter: true,
@@ -79,7 +79,6 @@ const List = () => {
         filterOptions: {
           names: [],
           logic(time, filters) {
-            console.log(time, filters)
             if (filters[0] && filters[1]) {
               return time <= filters[0] || time >= filters[1];
             } else if (filters[0]) {
@@ -143,7 +142,7 @@ const List = () => {
       options: {
         customBodyRenderLite: (dataIndex, rowIndex) => {
           const duration = callList[dataIndex].duration
-          return `${duration < 60 ? '' : duration / 60 + 'm'} ${duration % 60}s`
+          return `${duration < 60 ? '' : Math.trunc(duration / 60) + 'm'} ${duration % 60}s`
         },
         filter: true,
         filterType: 'custom',
@@ -285,13 +284,6 @@ const List = () => {
         sort: true,
       }
     },
-    {
-      name: "balanceAfterCall",
-      label: "Balance After Call",
-      options: {
-        filter: false,
-      }
-    },
   ];
   const options = {
     print: false,
@@ -307,13 +299,11 @@ const List = () => {
   };
 
   useEffect(() => {
-    debugger;
-    firebase.firestore().collectionGroup('calls').orderBy('time', 'desc').onSnapshot((calls) => {
+    firebase.firestore().collection('callLogs').orderBy('startTime', 'desc').onSnapshot((calls) => {
       setCallList([])
       calls.forEach((call) => {
         const callData = call.data()
-        callData.duration = (callData.minutes*60) + callData.seconds;
-        callData.time = new Date(callData.time.seconds * 1000)
+        callData.duration = Math.trunc(callData.endTime - callData.startTime);
         setCallList(prevList => [...prevList, callData])
       })
     })

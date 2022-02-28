@@ -19,15 +19,20 @@ const StatCards = () => {
   const [monthRevenue, setMonthRevenue] = useState('')
 
   useEffect(() => {
+
+        firebase
+        .firestore()
+        .collection("users")
+        .orderBy('createdAt', "desc").get().then(snap =>  setUserCount(snap.size));
+
+        firebase
+        .firestore()
+        .collection("pandits")
+        .orderBy('createdAt', "desc").get().then(snap =>  setPanditCount(snap.size))
+
     firebase.firestore().collection('stats').get().then(stats => {
       stats.docs.forEach(stat => {
-        if (stat.id === 'user_count') {
-          setUserCount(stat.data().value)
-        }
-        else if (stat.id === 'active_pandit_count') {
-          setPanditCount(stat.data().value)
-        }
-        else if (stat.id === 'daily_revenue') {
+        if (stat.id === 'daily_revenue') {
           setTodayRevenue(stat.data().value)
         }
         else if (stat.id === 'monthly_revenue') {
@@ -73,7 +78,7 @@ const StatCards = () => {
           </div>
         </Card>
       </Grid>
-      <Grid item xs={12} md={6}>
+      {/* <Grid item xs={12} md={6}>
         <Card
           className="flex flex-wrap justify-between align-center p-sm-24 bg-paper"
           elevation={6}
@@ -108,7 +113,7 @@ const StatCards = () => {
             </div>
           </div>
         </Card>
-      </Grid>
+      </Grid> */}
     </Grid>
   )
 }
